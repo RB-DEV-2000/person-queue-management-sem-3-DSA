@@ -1,0 +1,143 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX 100
+
+typedef struct {
+    char name[50];
+} Person;
+
+Person queue[MAX];
+int front = -1, rear = -1;
+
+// Check if the queue is full
+int isFull() {
+    return rear == MAX - 1;
+}
+
+// Check if the queue is empty
+int isEmpty() {
+    return front == -1 || front > rear;
+}
+
+// Shift the queue after a person is removed
+void shiftQueue(int pos) {
+    for (int i = pos; i < rear; i++) {
+        queue[i] = queue[i + 1];  // Shift each person up one position
+    }
+    rear--;  // Adjust the rear to reflect the change
+}
+
+// Add a person to the queue
+void enqueue() {
+    if (isFull()) {
+        printf("Queue is full, cannot add more persons.\n");
+        return;
+    }
+    if (front == -1) front = 0;
+    
+    char name[50];
+    printf("Enter the name of the person: ");
+    getchar();  // To consume the newline left by previous input
+    fgets(name, sizeof(name), stdin);  // Using fgets to capture the full name, including spaces
+    name[strcspn(name, "\n")] = '\0';  // Remove the newline character added by fgets
+    
+    rear++;
+    strcpy(queue[rear].name, name);
+    printf("%s added to the queue.\n", name);
+}
+
+// Remove a specific person from the queue
+void removePerson() {
+    if (isEmpty()) {
+        printf("Queue is empty, no one to remove.\n");
+        return;
+    }
+    
+    char name[50];
+    printf("Enter the name of the person to remove: ");
+    getchar();  // To consume the newline left by previous input
+    fgets(name, sizeof(name), stdin);  // Using fgets to capture the full name, including spaces
+    name[strcspn(name, "\n")] = '\0';  // Remove the newline character added by fgets
+    
+    // Search for the person in the queue
+    for (int i = front; i <= rear; i++) {
+        if (strcmp(queue[i].name, name) == 0) {
+            printf("%s removed from the queue.\n", queue[i].name);
+            shiftQueue(i);  // Shift the queue after removing the person
+            return;
+        }
+    }
+    printf("%s not found in the queue.\n", name);
+}
+
+// Search for a person in the queue
+void searchPerson() {
+    if (isEmpty()) {
+        printf("Queue is empty, no persons to search.\n");
+        return;
+    }
+    
+    char name[50];
+    printf("Enter the name to search: ");
+    getchar();  // To consume the newline left by previous input
+    fgets(name, sizeof(name), stdin);  // Using fgets to capture the full search term
+    name[strcspn(name, "\n")] = '\0';  // Remove the newline character added by fgets
+    
+    for (int i = front; i <= rear; i++) {
+        if (strcmp(queue[i].name, name) == 0) {
+            printf("%s found at position %d in the queue.\n", name, i - front + 1);
+            return;
+        }
+    }
+    printf("%s not found in the queue.\n", name);
+}
+
+// Display the queue
+void displayQueue() {
+    if (isEmpty()) {
+        printf("Queue is empty.\n");
+        return;
+    }
+    printf("Current Queue:\n");
+    for (int i = front; i <= rear; i++) {
+        printf("%d. %s\n", i - front + 1, queue[i].name);
+    }
+}
+
+int main() {
+    int choice;
+
+    do {
+        printf("\nQueue Management System\n");
+        printf("1. Add Person\n");
+        printf("2. Remove Person\n");
+        printf("3. Search Person\n");
+        printf("4. Display Queue\n");
+        printf("5. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);  // User input for menu selection
+
+        switch (choice) {
+            case 1:
+                enqueue();  // User adds a person
+                break;
+            case 2:
+                removePerson();  // Remove a specific person
+                break;
+            case 3:
+                searchPerson();  // Search for a person
+                break;
+            case 4:
+                displayQueue();  // Display the queue
+                break;
+            case 5:
+                printf("Exiting program.\n");
+                break;
+            default:
+                printf("Invalid choice, please try again.\n");
+        }
+    } while (choice != 5);
+
+    return 0;
+}
